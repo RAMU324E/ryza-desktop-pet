@@ -1,0 +1,26 @@
+{
+  "version": "2026-08-28",
+  "packs": [
+    {
+      "id": "media",
+      "file": "ryza-media-2026-08-28.zip",
+      "required": true,
+      "description": "Spine characters, scenes, ambient audio and runtime media.",
+      "paths": [
+        "assets",
+        "spine/crf_chr_002",
+        "spine/objects",
+        "spine/scenes"
+      ]
+    },
+    {
+      "id": "sidecars-win-x64",
+      "file": "ryza-sidecars-win-x64-2026-08-28.zip",
+      "required": false,
+      "description": "Optional prebuilt Moka and Clonoth sidecars for faster Windows recovery.",
+      "paths": [
+        "desktop/src-tauri/bin"
+      ]
+    }
+  ]
+}

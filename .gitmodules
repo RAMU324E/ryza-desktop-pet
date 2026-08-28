@@ -1,0 +1,6 @@
+[submodule "research/open-source/Clonoth"]
+	path = research/open-source/Clonoth
+	url = https://github.com/HCPTangHY/Clonoth.git
+[submodule "research/open-source/MOKAMOKA"]
+	path = research/open-source/MOKAMOKA
+	url = https://github.com/alksdesu/MOKAMOKA.git

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Ryza Chat 设置</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="settings-body">
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="返回聊天">
+      <span class="brand-mark">R</span>
+      <span><strong>Ryza Chat</strong><small>SETTINGS</small></span>
+    </a>
+    <a class="settings-back" href="./">← 返回聊天</a>
+    <div id="settings-status" class="status-pill" role="status">
+      <span class="status-dot"></span><span class="status-text">正在载入</span>
+    </div>
+  </header>
+
+  <main class="settings-shell">
+    <form id="settings-form" class="settings-card">
+      <div id="settings-message" class="settings-message" role="alert" hidden></div>
+      <section class="settings-section">
+        <div class="section-title">
+          <span class="section-index">LLM</span>
+          <div><h2>语言模型</h2><p>精确 URL、请求方法、请求头和请求体均可自由配置</p></div>
+        </div>
+        <div class="settings-grid">
+          <label class="field" for="llm-name"><span>配置名称</span><input id="llm-name" type="text" autocomplete="off"></label>
+          <label class="field" for="llm-method"><span>HTTP Method</span><input id="llm-method" type="text" autocomplete="off" placeholder="POST"></label>
+          <label class="field" for="llm-api-mode"><span>API 协议</span><select id="llm-api-mode"><option value="auto">自动识别</option><option value="chat-completions">Chat Completions</option><option value="responses">Responses</option></select></label>
+          <label class="field wide" for="llm-url"><span>精确 API URL</span><input id="llm-url" type="text" autocomplete="off" placeholder="https://example.com/v1/chat/completions"></label>
+          <label class="field wide" for="llm-key"><span>API Key（明文）</span><input id="llm-key" type="text" autocomplete="off" spellcheck="false"></label>
+          <label class="field" for="llm-model"><span>模型名</span><input id="llm-model" type="text" autocomplete="off"></label>
+          <label class="field" for="reasoning-effort"><span>推理强度（自由文本）</span><input id="reasoning-effort" type="text" autocomplete="off" placeholder="low"></label>
+          <label class="field" for="llm-temperature"><span>Temperature</span><input id="llm-temperature" type="number" min="0" max="2" step="0.1"></label>
+          <label class="field" for="llm-max-tokens"><span>Max tokens</span><input id="llm-max-tokens" type="number" min="1" step="1"></label>
+          <label class="field wide" for="llm-headers"><span>自定义请求头 JSON（覆盖默认请求头）</span><textarea id="llm-headers" class="json-editor" spellcheck="false" placeholder="{}"></textarea></label>
+          <label class="field wide" for="llm-extra-body"><span>额外请求体 JSON（覆盖默认请求体字段）</span><textarea id="llm-extra-body" class="json-editor" spellcheck="false" placeholder="{}"></textarea></label>
+        </div>
+        <div class="check-row">
+          <label class="plain-check"><input id="llm-thinking" type="checkbox"> 开启推理</label>
+          <label class="plain-check"><input id="llm-response-format" type="checkbox"> 发送 response_format=json_object</label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-title">
+          <span class="section-index">AGENT</span>
+          <div><h2>Clonoth 与外部能力</h2><p>长期记忆、视觉 Provider 和单个 Streamable HTTP MCP</p></div>
+        </div>
+        <div class="settings-grid">
+          <label class="field" for="agent-source"><span>对话 Agent</span><select id="agent-source"><option value="clonoth">Clonoth（推荐）</option><option value="direct">Direct Provider（回退）</option></select></label>
+        </div>
+        <div class="check-row">
+          <label class="plain-check"><input id="vision-enabled" type="checkbox"> 截图使用独立视觉 Provider</label>
+        </div>
+        <div class="settings-grid">
+          <label class="field" for="vision-api-mode"><span>视觉 API 协议</span><select id="vision-api-mode"><option value="auto">自动识别</option><option value="chat-completions">Chat Completions</option><option value="responses">Responses</option></select></label>
+          <label class="field" for="vision-model"><span>视觉模型</span><input id="vision-model" type="text" autocomplete="off"></label>
+          <label class="field wide" for="vision-url"><span>视觉 API URL</span><input id="vision-url" type="text" autocomplete="off" placeholder="https://api.openai.com/v1/responses"></label>
+          <label class="field wide" for="vision-key"><span>视觉 API Key（明文）</span><input id="vision-key" type="text" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <div class="check-row">
+          <label class="plain-check"><input id="mcp-enabled" type="checkbox"> 启用搜索 MCP</label>
+        </div>
+        <div class="settings-grid">
+          <label class="field wide" for="mcp-url"><span>Streamable HTTP MCP URL</span><input id="mcp-url" type="text" autocomplete="off" placeholder="https://example.com/mcp"></label>
+          <label class="field wide" for="mcp-headers"><span>MCP Headers JSON</span><textarea id="mcp-headers" class="json-editor" spellcheck="false" placeholder="{}"></textarea></label>
+        </div>
+        <small class="field-help">MCP 配置变化会自动重启本地 Clonoth Engine；对话记忆保存在 %APPDATA%\RyzaPet\clonoth。</small>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-title">
+          <span class="section-index">POSE</span>
+          <div><h2>角色姿态</h2><p>手动切换 01 坐姿 / 99 站姿，以及 01 内的普通坐姿 / 盘腿坐姿</p></div>
+        </div>
+        <div class="settings-grid">
+          <label class="field" for="character-stance"><span>基础姿态</span><select id="character-stance"><option value="sitting">坐姿（01）</option><option value="standing">站姿（99）</option></select></label>
+          <label class="field" for="character-sitting-pose"><span>坐姿类型</span><select id="character-sitting-pose"><option value="normal">普通坐姿</option><option value="agura">盘腿坐姿</option></select></label>
+        </div>
+        <small class="field-help">保存后立即切换并记住选择；站姿下会暂时禁用坐姿类型，切回坐姿时恢复上次选择。也可以在聊天中让莱莎“站起来 / 坐下 / 盘腿坐”。</small>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-title">
+          <span class="section-index">TTS</span>
+          <div><h2>语音合成档案</h2><p>MiMo、HF 云端和本地 GPT-SoVITS 作为独立档案共存</p></div>
+        </div>
+
+        <div class="settings-grid">
+          <label class="field wide" for="tts-speech-mode">
+            <span>回复 / 朗读语言模式</span>
+            <select id="tts-speech-mode">
+              <option value="zh">中文回复 → 中文语音</option>
+              <option value="zh-ja">中文回复 → 日语语音</option>
+            </select>
+            <small class="field-help">日语语音模式会保留聊天文字和历史记录为中文，仅在合成前用当前 LLM 翻译朗读文本，并自动向 HF / GPT-SoVITS 发送 ja 语言参数。</small>
+          </label>
+        </div>
+
+        <div class="profile-toolbar">
+          <label class="field profile-picker" for="tts-profile-select"><span>当前档案</span><select id="tts-profile-select"></select></label>
+          <button id="tts-profile-add" class="secondary-button" type="button">新增</button>
+          <button id="tts-profile-copy" class="secondary-button" type="button">复制</button>
+          <button id="tts-profile-delete" class="secondary-button danger-button" type="button">删除</button>
+        </div>
+
+        <div class="preset-row" aria-label="TTS 快捷预设">
+          <span>快捷添加</span>
+          <button id="tts-preset-mimo" class="secondary-button" type="button">MiMo 冰糖</button>
+          <button id="tts-preset-hf" class="secondary-button" type="button">HF 莱莎 ASMR</button>
+          <button id="tts-preset-gpt" class="secondary-button" type="button">GPT-SoVITS v2</button>
+        </div>
+
+        <div class="settings-grid profile-fields">
+          <label class="field" for="tts-profile-name"><span>档案名称</span><input id="tts-profile-name" type="text" autocomplete="off"></label>
+          <label class="field" for="tts-adapter"><span>Adapter</span><select id="tts-adapter"><option value="mimo-sse">mimo-sse</option><option value="http-wav">http-wav</option><option value="gpt-sovits-stream">gpt-sovits-stream</option><option value="raw-pcm">raw-pcm</option></select></label>
+          <label class="field wide" for="tts-url"><span>精确 API URL</span><input id="tts-url" type="text" autocomplete="off"></label>
+          <label class="field" for="tts-method"><span>HTTP Method</span><input id="tts-method" type="text" autocomplete="off" placeholder="POST"></label>
+          <label class="field" for="tts-key"><span>Key（可选，明文）</span><input id="tts-key" type="text" autocomplete="off" spellcheck="false"></label>
+          <label class="field" for="tts-model"><span>模型名（可选）</span><input id="tts-model" type="text" autocomplete="off"></label>
+          <label class="field" for="tts-voice"><span>声线（可选）</span><input id="tts-voice" type="text" autocomplete="off"></label>
+          <label class="field wide" for="tts-headers"><span>请求头 JSON（Authorization 可直接明文填写）</span><textarea id="tts-headers" class="json-editor" spellcheck="false" placeholder="{}"></textarea></label>
+          <label class="field wide" for="tts-body-template"><span>请求体模板</span><textarea id="tts-body-template" class="template-editor" spellcheck="false"></textarea><small class="field-help">支持 {{JSON.stringify(speakText)}}、text、model、voice、instruction、speechLanguage</small></label>
+          <label class="field wide" for="tts-response-content-type"><span>期望响应 Content-Type</span><input id="tts-response-content-type" type="text" autocomplete="off" placeholder="audio/wav"></label>
+          <label class="field" for="tts-format"><span>PCM Format</span><select id="tts-format"><option value="int16">int16</option><option value="float32">float32</option></select></label>
+          <label class="field" for="tts-sample-rate"><span>Sample rate</span><input id="tts-sample-rate" type="number" min="1000" max="768000" step="1"></label>
+          <label class="field" for="tts-channels"><span>Channels</span><input id="tts-channels" type="number" min="1" step="1"></label>
+          <label class="field" for="tts-concurrency"><span>Concurrency</span><input id="tts-concurrency" type="number" min="1" step="1"></label>
+        </div>
+        <div class="check-row">
+          <label class="plain-check"><input id="tts-streaming" type="checkbox"> 流式响应</label>
+        </div>
+        <div class="subsection-title">嘴型响应（全局）</div>
+        <div class="settings-grid mouth-speed-grid">
+          <label class="field" for="mouth-sensitivity"><span>嘴型灵敏度</span><input id="mouth-sensitivity" type="number" min="0.25" max="4" step="0.05"></label>
+          <label class="field" for="mouth-attack-ms"><span>张嘴响应（ms）</span><input id="mouth-attack-ms" type="number" min="10" max="1000" step="10"></label>
+          <label class="field" for="mouth-release-ms"><span>闭嘴响应（ms）</span><input id="mouth-release-ms" type="number" min="10" max="2000" step="10"></label>
+          <label class="field" for="mouth-mix-ms"><span>开始/结束过渡（ms）</span><input id="mouth-mix-ms" type="number" min="0" max="500" step="10"></label>
+        </div>
+        <small class="field-help">嘴型现在连续擦洗，不再使用离散档位保持；灵敏度控制幅度，张嘴/闭嘴响应控制跟随速度，开始/结束过渡负责切入和退出。推荐：1.6 / 90 / 150 / 140。</small>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-title">
+          <span class="section-index">SYS</span>
+          <div><h2>系统提示词</h2><p>直接编辑发送给 LLM 的完整角色提示词</p></div>
+        </div>
+        <label class="field" for="system-prompt"><span>LLM System Prompt</span><textarea id="system-prompt" class="prompt-editor" spellcheck="false"></textarea></label>
+        <label class="field" for="tts-instruction"><span>当前 TTS 档案语音提示词</span><textarea id="tts-instruction" class="tts-prompt-editor" spellcheck="false" placeholder="例如：请使用自然、亲切、清晰的中文语音朗读。"></textarea><small class="field-help">MiMo 模板通过 {{JSON.stringify(instruction)}} 使用这里的内容；切换 TTS 档案时此字段也会切换。</small></label>
+      </section>
+
+      <div class="settings-actions">
+        <button id="settings-reload" class="secondary-button" type="button">重新载入</button>
+        <button id="settings-test-llm" class="secondary-button" type="button">测试 LLM</button>
+        <button id="settings-test-tts" class="secondary-button" type="button">测试并播放 TTS</button>
+        <button id="settings-save" class="primary-button" type="submit">保存并立即生效</button>
+        <div id="settings-save-feedback" class="save-feedback" role="status" aria-live="polite">修改配置后点击保存</div>
+      </div>
+    </form>
+  </main>
+  <script src="settings.js"></script>
+</body>
+</html>

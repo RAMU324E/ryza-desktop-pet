@@ -1,0 +1,40 @@
+# Private runtime state and secrets
+bridge/.env
+bridge/settings.json
+bridge/tmp/
+*.log
+
+# Python / Node / Rust build state
+.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/*.egg-info/
+**/node_modules/
+.tmp/
+desktop/src-tauri/target/
+desktop/src-tauri/bin/
+desktop/src-tauri/gen/
+
+# Large runtime media distributed as resource packs
+assets/
+spine/crf_chr_002/
+spine/objects/
+spine/scenes/
+resource-packs/*.zip
+resource-packs/*.7z
+resource-packs/staging/
+
+# Research fixtures and unrelated upstream checkouts
+reference/fixtures/
+research/open-source/*
+!research/open-source/Clonoth/
+!research/open-source/MOKAMOKA/
+
+# IDE / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local transfer archives
+*.zip

@@ -1,0 +1,25 @@
+version: 1
+extra_roots: []
+read_file:
+  default: deny
+write_file:
+  default: deny
+execute_command:
+  default: deny
+restart:
+  default: auto
+tools:
+  default: deny
+  rules:
+    - name: mcp_*
+      decision: auto
+      reason: configured Ryza MCP tools
+    - name: save_memory
+      decision: auto
+      reason: Ryza long-term memory
+    - name: list_memories
+      decision: auto
+      reason: Ryza long-term memory
+    - name: delete_memory
+      decision: auto
+      reason: Ryza long-term memory

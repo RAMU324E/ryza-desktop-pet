@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Ryza Spine 控制台</title>
+  <link rel="icon" href="data:,">
+  <script>if (!location.port || new URLSearchParams(location.search).has('desktop')) document.documentElement.classList.add('desktop-mode');</script>
+  <link rel="stylesheet" href="vendor/spine/spine-player.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="desktop-drag-region" data-tauri-drag-region title="拖动桌宠窗口"></div>
+  <div id="layout-adjust-overlay" class="layout-adjust-overlay" aria-hidden="true">
+    <button class="layout-resize-handle north" type="button" data-resize-direction="North" aria-label="向上调整大小"></button>
+    <button class="layout-resize-handle east" type="button" data-resize-direction="East" aria-label="向右调整大小"></button>
+    <button class="layout-resize-handle south" type="button" data-resize-direction="South" aria-label="向下调整大小"></button>
+    <button class="layout-resize-handle west" type="button" data-resize-direction="West" aria-label="向左调整大小"></button>
+    <button class="layout-resize-handle north-west" type="button" data-resize-direction="NorthWest" aria-label="调整左上角"></button>
+    <button class="layout-resize-handle north-east" type="button" data-resize-direction="NorthEast" aria-label="调整右上角"></button>
+    <button class="layout-resize-handle south-west" type="button" data-resize-direction="SouthWest" aria-label="调整左下角"></button>
+    <button class="layout-resize-handle south-east" type="button" data-resize-direction="SouthEast" aria-label="调整右下角"></button>
+  </div>
+  <button id="chat-drawer-toggle" class="chat-drawer-toggle" type="button" aria-expanded="false" title="打开聊天抽屉">💬</button>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="回到控制台首页">
+      <span class="brand-mark">R</span>
+      <span>
+        <strong>Ryza Spine</strong>
+        <small>ANIMATION CONTROL DESK</small>
+      </span>
+    </a>
+
+    <div class="topbar-meta" aria-label="资源信息">
+      <span>Spine <strong>4.2.43</strong></span>
+      <i></i>
+      <span><strong id="character-count">2</strong> 角色</span>
+      <i></i>
+      <span><strong id="scene-count">200</strong> 场景</span>
+    </div>
+
+    <div id="global-status" class="status-pill" role="status" aria-live="polite">
+      <span class="status-dot"></span>
+      <span class="status-text">准备加载</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="preview-card" aria-labelledby="preview-heading">
+      <div class="card-heading">
+        <div>
+          <span class="eyebrow">LIVE PREVIEW</span>
+          <h1 id="preview-heading">实时预览</h1>
+        </div>
+        <div class="preview-actions">
+          <a class="icon-button" href="settings.html" title="聊天与模型设置" aria-label="聊天与模型设置">⚙</a>
+          <button id="reload-button" class="icon-button" type="button" title="重新加载资源" aria-label="重新加载资源">↻</button>
+          <button id="fullscreen-button" class="icon-button" type="button" title="全屏预览" aria-label="全屏预览">⛶</button>
+        </div>
+      </div>
+
+      <div id="viewport" class="viewport checkerboard">
+        <div id="scene-player" class="player-layer scene-layer" aria-hidden="true"></div>
+        <div id="character-player" class="player-layer character-layer"></div>
+        <div id="loading-overlay" class="loading-overlay" aria-live="polite">
+          <span class="spinner"></span>
+          <strong>正在装配骨骼与贴图</strong>
+          <small>首次载入大图可能需要几秒</small>
+        </div>
+        <div class="viewport-badge" hidden>WEBGL · LIVE</div>
+        <details id="track-debug-panel" class="track-debug-panel">
+          <summary>轨道调试</summary>
+          <pre id="track-debug" class="track-debug" aria-label="轨道调试信息"></pre>
+        </details>
+      </div>
+
+      <footer class="preview-footer">
+        <div>
+          <span class="footer-label">角色资源</span>
+          <code id="active-character">—</code>
+        </div>
+        <div>
+          <span class="footer-label">场景资源</span>
+          <code id="active-scene">—</code>
+        </div>
+        <div class="footer-state">
+          <span id="scene-status">场景等待加载</span>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="control-panel" aria-label="聊天与动画控制面板">
+      <section class="panel-section chat-section">
+        <div class="section-title">
+          <span class="section-index">CHAT</span>
+          <div>
+            <h2>和莱莎聊天</h2>
+            <p id="chat-status">正在检查本地服务…</p>
+          </div>
+          <button id="chat-settings" class="chat-settings-button" type="button" title="打开 LLM / TTS 设置" aria-label="打开 LLM / TTS 设置">⚙ <span>设置</span></button>
+        </div>
+
+        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+        <form id="chat-form" class="chat-form">
+          <label class="field" for="chat-input">
+            <span>消息</span>
+            <textarea id="chat-input" rows="3" maxlength="4000" placeholder="输入消息；可 Ctrl+V 粘贴截图"></textarea>
+          </label>
+          <div class="chat-actions">
+            <button id="chat-send" class="primary-button" type="submit">发送</button>
+            <button id="chat-stop" class="secondary-button" type="button" disabled>停止</button>
+            <button id="chat-clear" class="secondary-button" type="button">清空</button>
+          </div>
+        </form>
+        <div class="chat-options">
+          <label><input id="tts-enabled" type="checkbox" checked> 语音</label>
+          <label class="volume-control" for="tts-volume">音量 <input id="tts-volume" type="range" min="0" max="1" step="0.05" value="1"></label>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-title">
+          <span class="section-index">01</span>
+          <div>
+            <h2>角色资源</h2>
+            <p>切换当前 Spine 骨骼</p>
+          </div>
+        </div>
+
+        <label class="field" for="character-select">
+          <span>角色版本</span>
+          <select id="character-select"></select>
+        </label>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-title">
+          <span class="section-index">02</span>
+          <div>
+            <h2>场景环境</h2>
+            <p>筛选并切换背景层</p>
+          </div>
+        </div>
+
+        <label class="field" for="scene-search">
+          <span>搜索场景</span>
+          <input id="scene-search" type="search" placeholder="例如 01_001" autocomplete="off">
+        </label>
+
+        <div class="field-row">
+          <label class="field" for="period-filter">
+            <span>时间</span>
+            <select id="period-filter">
+              <option value="all">全部时段</option>
+              <option value="mor">早晨</option>
+              <option value="aft">下午</option>
+              <option value="eve">傍晚</option>
+              <option value="ngt">夜晚</option>
+            </select>
+          </label>
+          <label class="field" for="scene-select">
+            <span>场景</span>
+            <select id="scene-select"></select>
+          </label>
+        </div>
+
+        <label class="switch-row" for="scene-visible">
+          <span>
+            <strong>显示场景层</strong>
+            <small>关闭后仅显示角色</small>
+          </span>
+          <input id="scene-visible" type="checkbox" checked>
+          <i aria-hidden="true"></i>
+        </label>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-title">
+          <span class="section-index">03</span>
+          <div>
+            <h2>动作测试</h2>
+            <p>只显示可独立播放的动作</p>
+          </div>
+        </div>
+
+        <label class="field" for="motion-select">
+          <span>基础 / 一次性动作</span>
+          <select id="motion-select" disabled></select>
+        </label>
+        <button id="play-motion" class="expression-button" type="button" disabled>播放所选动作</button>
+
+        <label class="field" for="motion-group-select">
+          <span>叠加动作组（使用资源原始标签）</span>
+          <select id="motion-group-select" disabled></select>
+        </label>
+        <div class="button-row">
+          <button id="play-motion-group" class="expression-button" type="button" disabled>播放叠加动作</button>
+          <button id="stop-motion-group" class="secondary-button" type="button" disabled>停止叠加</button>
+        </div>
+
+        <label class="field" for="all-animation-select">
+          <span>全部原始动画（调试）</span>
+          <select id="all-animation-select" disabled></select>
+        </label>
+        <button id="play-all-animation" class="secondary-button" type="button" disabled>播放原始动画</button>
+
+        <div class="subsection-title">姿态、视线与触摸</div>
+        <div class="field-row expression-fields">
+          <label class="field" for="attitude-test-select">
+            <span>姿态</span>
+            <select id="attitude-test-select">
+              <option value="idle">idle</option><option value="agree">agree</option>
+              <option value="deny">deny</option><option value="question">question</option>
+            </select>
+          </label>
+          <label class="field" for="look-test-select">
+            <span>视线</span>
+            <select id="look-test-select">
+              <option value="pointer">跟随鼠标</option><option value="user">看向用户</option>
+              <option value="front">回正</option><option value="left">左</option><option value="right">右</option>
+              <option value="up">上</option><option value="down">下</option>
+            </select>
+          </label>
+        </div>
+        <button id="apply-pose-look" class="secondary-button" type="button">应用姿态与视线</button>
+        <div class="field-row expression-fields">
+          <label class="field" for="tap-part-select"><span>触摸区域</span><select id="tap-part-select" disabled></select></label>
+          <button id="play-tap-reaction" class="secondary-button" type="button" disabled>触发触摸反应</button>
+        </div>
+        <label class="switch-row" for="hit-debug-visible">
+          <span><strong>显示 Hit Box</strong><small>使用 Spine 官方 BoundingBox 调试绘制</small></span>
+          <input id="hit-debug-visible" type="checkbox"><i aria-hidden="true"></i>
+        </label>
+        <code id="motion-status" class="control-status">动作配置加载中…</code>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-title">
+          <span class="section-index">04</span>
+          <div>
+            <h2>表情调度</h2>
+            <p>情绪组合与部件单独测试</p>
+          </div>
+        </div>
+
+        <div class="field-row expression-fields">
+          <label class="field" for="emotion-select">
+            <span>情绪</span>
+            <select id="emotion-select" disabled></select>
+          </label>
+          <label class="field" for="intensity-select">
+            <span>强度</span>
+            <select id="intensity-select" disabled></select>
+          </label>
+        </div>
+
+        <button id="reroll-expression" class="expression-button" type="button" disabled>换一组表情</button>
+
+        <label class="switch-row" for="mouth-takeover">
+          <span>
+            <strong>表情接管嘴型</strong>
+            <small>关闭时 Track 3 保持默认闭嘴 idle</small>
+          </span>
+          <input id="mouth-takeover" type="checkbox" disabled>
+          <i aria-hidden="true"></i>
+        </label>
+
+        <button id="clear-expression" class="secondary-button" type="button" disabled>清除表情（回基线）</button>
+
+        <div class="subsection-title">单独测试表情部件</div>
+        <div class="field-row expression-fields">
+          <label class="field" for="eye-test-select">
+            <span>眼睛</span>
+            <select id="eye-test-select" disabled></select>
+          </label>
+          <label class="field" for="eyebrow-test-select">
+            <span>眉毛</span>
+            <select id="eyebrow-test-select" disabled></select>
+          </label>
+        </div>
+        <div class="field-row expression-fields">
+          <label class="field" for="mouth-test-select">
+            <span>嘴型</span>
+            <select id="mouth-test-select" disabled></select>
+          </label>
+          <label class="field" for="fx-test-select">
+            <span>脸部效果</span>
+            <select id="fx-test-select" disabled></select>
+          </label>
+        </div>
+
+        <div class="scheduler-state" aria-live="polite">
+          <span><i></i>L0 身体</span>
+          <span><i></i>L1–L4 面部</span>
+          <code id="expression-status">表情配置加载中…</code>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-title">
+          <span class="section-index">05</span>
+          <div>
+            <h2>预览选项</h2>
+            <p>调整画布和控制条</p>
+          </div>
+        </div>
+
+        <label class="switch-row" for="controls-visible">
+          <span>
+            <strong>播放控制条</strong>
+            <small>播放/暂停、时间轴、速度（动作列表改到上方）</small>
+          </span>
+          <input id="controls-visible" type="checkbox" checked>
+          <i aria-hidden="true"></i>
+        </label>
+
+        <label class="switch-row" for="checker-visible">
+          <span>
+            <strong>透明棋盘格</strong>
+            <small>辅助检查透明区域</small>
+          </span>
+          <input id="checker-visible" type="checkbox" checked>
+          <i aria-hidden="true"></i>
+        </label>
+
+        <label class="color-row" for="canvas-color">
+          <span>
+            <strong>画布底色</strong>
+            <small>场景透明处的颜色</small>
+          </span>
+          <input id="canvas-color" type="color" value="#17151f">
+        </label>
+      </section>
+
+      <div class="panel-actions">
+        <button id="reset-button" class="secondary-button" type="button">恢复默认</button>
+        <button id="apply-button" class="primary-button" type="button">重新载入</button>
+      </div>
+
+      <p class="panel-tip"><strong>提示：</strong>动作和表情已按类型放在上方选择器；底部 Spine 控制条只负责播放/暂停、进度和速度，不再显示内部动画名长列表。</p>
+    </aside>
+  </main>
+
+  <noscript>此控制台需要启用 JavaScript。</noscript>
+  <script src="vendor/spine/spine-player.min.js"></script>
+  <script src="assets.js"></script>
+  <script src="app.js"></script>
+  <script type="module" src="chat.js"></script>
+</body>
+</html>

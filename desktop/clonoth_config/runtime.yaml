@@ -1,0 +1,35 @@
+version: 1
+engine:
+  max_steps: 24
+  streaming: true
+  history_limit: 80
+  poll_interval_sec: 0.25
+  max_workers: 1
+  tool_mode: native
+  output_mode: hybrid
+  retry:
+    max_retries: 1
+    initial_delay_sec: 1.0
+    max_delay_sec: 4.0
+  http:
+    client_timeout_sec: 120.0
+routing:
+  entry_node_id: ryza.chat
+memory:
+  max_budget_chars: 24000
+  auto_extract:
+    enabled: true
+    node_id: system.memory_extractor
+    min_messages: 4
+    min_increment: 6
+    idle_fallback_delay_sec: 60
+  dream:
+    enabled: true
+    cron: "0 19 * * *"
+    node_id: system.dream
+    min_sessions: 0
+    conversation_key: system:dream
+supervisor:
+  process_manager:
+    stop_wait_timeout_sec: 3.0
+    engine_workers: 1

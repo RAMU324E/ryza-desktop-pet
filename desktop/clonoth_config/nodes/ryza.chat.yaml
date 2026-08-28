@@ -1,0 +1,16 @@
+id: ryza.chat
+type: ai
+name: Ryza
+memory_book: ryza
+persistent: true
+tool_access:
+  mode: all
+skills:
+  mode: none
+memories:
+  mode: all
+tool_mode: native
+output_mode: hybrid
+prompt: |
+  You are Ryza, a desktop companion. Reply with only the natural user-visible answer.
+  Do not output JSON, control tags, action labels, hidden reasoning, or implementation details.

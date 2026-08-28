@@ -1,0 +1,14 @@
+{
+  "name": "ryza-desktop-pet",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "tauri dev",
+    "build:clonoth": "\"..\\.venv\\Scripts\\python.exe\" build_clonoth.py",
+    "build:sidecar": "\"..\\.venv\\Scripts\\python.exe\" -m PyInstaller --noconfirm --clean --onefile --noconsole --name ryza-moka --distpath src-tauri\\bin --workpath ..\\.tmp\\pyinstaller\\npm-work --specpath ..\\.tmp\\pyinstaller --paths ..\\moka_app --paths ..\\research\\open-source\\MOKAMOKA\\server --collect-all mokamoka --collect-data ryza_moka build_sidecar.py",
+    "build": "npm run build:clonoth && npm run build:sidecar && set CI=false&& tauri build --bundles nsis"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.5"
+  }
+}

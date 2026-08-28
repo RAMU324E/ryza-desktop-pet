@@ -1,0 +1,10 @@
+{
+  "name": "ryza-spine-all",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:web": "node --check spine/app.js && node --check spine/chat.js && node --check spine/settings.js",
+    "desktop:dev": "npm --prefix desktop run dev",
+    "desktop:build": "npm --prefix desktop run build"
+  }
+}

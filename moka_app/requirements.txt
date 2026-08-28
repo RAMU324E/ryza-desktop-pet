@@ -1,0 +1,5 @@
+-e ./research/open-source/MOKAMOKA/server
+-r ../research/open-source/Clonoth/requirements.txt
+-e ./moka_app
+pytest>=8
+pytest-asyncio>=0.23
